@@ -14,38 +14,28 @@ class Scene2 extends Phaser.Scene
     this.ship2 = this.add.sprite(config.width/2, config.height/2, "ship2");
     this.ship3 = this.add.sprite(config.width/2 + 50, config.height/2, "ship3");
 
-    this.anims.create(
-      {
-        key: "ship1_anim",
-        frames: this.anims.generateFrameNumbers("ship"),
-        frameRate: 20,
-        repeat: -1
-      });
+    this.powerUps = this.physics.add.group();
 
-    this.anims.create(
-      {
-        key: "ship2_anim",
-        frames: this.anims.generateFrameNumbers("ship2"),
-        frameRate: 20,
-        repeat: -1
-      });
+    let maxObjects = 5;
+    for (let i = 0; i < maxObjects; i++)
+    {
+      let powerUp = this.physics.add.sprite(16, 16, "power-up");
+      this.powerUps.add(powerUp);
+      powerUp.setRandomPosition(0, 0, game.config.width, game.config.height);
 
-    this.anims.create(
+      if (Math.random() > 0.5)
       {
-        key: "ship3_anim",
-        frames: this.anims.generateFrameNumbers("ship3"),
-        frameRate: 20,
-        repeat: -1
-      });
+        powerUp.play("red");
+      }
+      else
+      {
+        powerUp.play("gray");
+      }
 
-    this.anims.create(
-      {
-        key: "explode",
-        frames: this.anims.generateFrameNumbers("explosion"),
-        frameRate: 20,
-        repeat: 0,
-        hideOnComplete: true
-      });
+      powerUp.setVelocity(100, 100);
+      powerUp.setCollideWorldBounds(true);
+      powerUp.setBounce(1);
+    }
 
     this.ship1.play("ship1_anim");
     this.ship2.play("ship2_anim");
