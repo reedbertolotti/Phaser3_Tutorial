@@ -87,7 +87,7 @@ class Scene2 extends Phaser.Scene
     let randomX = Phaser.Math.Between(0, config.width);
     ship.x = randomX;
 
-    if (ship.texture.key == "explosion")
+    if (ship.texture.key == "explosion") // if ship exploded
     {
       ship.visible = true;
       ship.setTexture(ship.defaultSprite);
