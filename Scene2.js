@@ -79,11 +79,19 @@ class Scene2 extends Phaser.Scene
 
     this.physics.add.overlap(this.projectiles, this.enemies, this.hitEnemy, null, this);
 
-    this.add.text(20, 20, "Playing game",
-      {
-        font: "25px Arial",
-        fill: "yellow"
-      });
+    let graphics = this.add.graphics();
+    graphics.fillStyle(0x000000, 1);
+    graphics.beginPath();
+    graphics.moveTo(0, 0);
+    graphics.lineTo(config.width, 0);
+    graphics.lineTo(config.width, 20);
+    graphics.lineTo(0, 20);
+    graphics.lineTo(0, 0);
+    graphics.closePath();
+    graphics.fillPath();
+
+    this.score = 0;
+    this.scoreLabel = this.add.bitmapText(10, 5, "pixelFont", "SCORE ", 16);
   }
 
   update()
@@ -181,5 +189,19 @@ class Scene2 extends Phaser.Scene
   {
     projectile.destroy();
     this.resetShipPos(enemy);
+    this.score += 15;
+    let scoreFormatted = this.zeroPad(this.score, 6);
+    this.scoreLabel.text = "SCORE " + scoreFormatted;
+  }
+
+  zeroPad(number, size)
+  {
+    let stringNumber = String(number);
+    while(stringNumber.length < (size || 2))
+    {
+      stringNumber = "0" + stringNumber;
+    }
+
+    return stringNumber;
   }
 }
