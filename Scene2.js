@@ -80,15 +80,17 @@ class Scene2 extends Phaser.Scene
     this.physics.add.overlap(this.projectiles, this.enemies, this.hitEnemy, null, this);
 
     let graphics = this.add.graphics();
-    graphics.fillStyle(0x000000, 1);
-    graphics.beginPath();
-    graphics.moveTo(0, 0);
-    graphics.lineTo(config.width, 0);
-    graphics.lineTo(config.width, 20);
-    graphics.lineTo(0, 20);
-    graphics.lineTo(0, 0);
-    graphics.closePath();
-    graphics.fillPath();
+    graphics.fillStyle("Black");
+    graphics.fillRect(0, 0, config.width, 20);
+    // graphics.fillStyle(0x000000, 1);
+    // graphics.beginPath();
+    // graphics.moveTo(0, 0);
+    // graphics.lineTo(config.width, 0);
+    // graphics.lineTo(config.width, 20);
+    // graphics.lineTo(0, 20);
+    // graphics.lineTo(0, 0);
+    // graphics.closePath();
+    // graphics.fillPath();
 
     this.score = 0;
     this.scoreLabel = this.add.bitmapText(10, 5, "pixelFont", "SCORE ", 16);
@@ -106,7 +108,8 @@ class Scene2 extends Phaser.Scene
 
     if (Phaser.Input.Keyboard.JustDown(this.spacebar))
     {
-      this.shootBeam();
+      if (this.player.active)
+        this.shootBeam();
     }
 
     for (let i = 0; i < this.projectiles.getChildren().length; i++)
@@ -181,12 +184,25 @@ class Scene2 extends Phaser.Scene
   hurtPlayer(player, enemy)
   {
     this.resetShipPos(enemy);
-    player.x = config.width / 2 - 8;
-    player.y = config.height - 64;
+
+    if (this.player.alpha < 1)
+      return;
+
+    let explosion = new Explosion(this, player.x, player.y);
+    player.disableBody(true, true);
+
+    this.time.addEvent(
+      {
+        delay: 1000,
+        callback: this.resetPlayer,
+        callbackScope: this,
+        loop: false
+      });
   }
 
   hitEnemy(projectile, enemy)
   {
+    let explosion = new Explosion(this, enemy.x, enemy.y);
     projectile.destroy();
     this.resetShipPos(enemy);
     this.score += 15;
@@ -203,5 +219,27 @@ class Scene2 extends Phaser.Scene
     }
 
     return stringNumber;
+  }
+
+  resetPlayer()
+  {
+    let x = config.width / 2 - 8;
+    let y = config.height + 64;
+    this.player.enableBody(true, x, y, true, true);
+    this.player.alpha = 0.5;
+
+    let tween = this.tweens.add(
+      {
+        targets: this.player,
+        y: config.height - 64,
+        ease: 'Power1',
+        duration: 1500,
+        repeat: 0,
+        onComplete: function()
+        {
+          this.player.alpha = 1;
+        },
+        callbackScope: this
+      });
   }
 }
