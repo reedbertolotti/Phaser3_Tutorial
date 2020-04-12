@@ -82,18 +82,26 @@ class Scene2 extends Phaser.Scene
     let graphics = this.add.graphics();
     graphics.fillStyle("Black");
     graphics.fillRect(0, 0, config.width, 20);
-    // graphics.fillStyle(0x000000, 1);
-    // graphics.beginPath();
-    // graphics.moveTo(0, 0);
-    // graphics.lineTo(config.width, 0);
-    // graphics.lineTo(config.width, 20);
-    // graphics.lineTo(0, 20);
-    // graphics.lineTo(0, 0);
-    // graphics.closePath();
-    // graphics.fillPath();
 
     this.score = 0;
     this.scoreLabel = this.add.bitmapText(10, 5, "pixelFont", "SCORE ", 16);
+
+    this.beamSound = this.sound.add("audio_beam");
+    this.explosionSound = this.sound.add("audio_explosion");
+    this.pickupSound = this.sound.add("audio_pickup");
+
+    this.music = this.sound.add("music");
+    let musicConfig =
+    {
+      mute: false,
+      volume: 1,
+      rate: 3,
+      detune: 0,
+      seek: 0,
+      loop: true,
+      delay: 0
+    }
+    this.music.play(musicConfig);
   }
 
   update()
@@ -174,11 +182,13 @@ class Scene2 extends Phaser.Scene
   shootBeam()
   {
     let beam = new Beam(this);
+    this.beamSound.play();
   }
 
   pickPowerUp(player, powerUp)
   {
     powerUp.disableBody(true, true);
+    this.pickupSound.play();
   }
 
   hurtPlayer(player, enemy)
@@ -189,6 +199,7 @@ class Scene2 extends Phaser.Scene
       return;
 
     let explosion = new Explosion(this, player.x, player.y);
+    this.explosionSound.play({detune: -1000});
     player.disableBody(true, true);
 
     this.time.addEvent(
@@ -208,6 +219,7 @@ class Scene2 extends Phaser.Scene
     this.score += 15;
     let scoreFormatted = this.zeroPad(this.score, 6);
     this.scoreLabel.text = "SCORE " + scoreFormatted;
+    this.explosionSound.play({detune: 0});
   }
 
   zeroPad(number, size)
